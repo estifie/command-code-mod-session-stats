@@ -143,7 +143,7 @@ test('right-aligns the footer to the terminal width', () => {
 		const raw = h.status() ?? '';
 		assert.ok(raw.startsWith(' '), 'expected leading padding');
 		assert.ok(h.statusText()?.endsWith('$0.524'), h.statusText() ?? '');
-		assert.equal(stripAnsi(raw).length, 80 - 2 - 1);
+		assert.equal(stripAnsi(raw).length, 80 - 2 - 2);
 	} finally {
 		if (original) Object.defineProperty(process.stdout, 'columns', original);
 		else delete (process.stdout as {columns?: number}).columns;

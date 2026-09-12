@@ -5,8 +5,8 @@ export type Align = 'left' | 'right';
 /** Command Code renders a mod status segment with this much left padding. */
 export const HOST_PADDING_LEFT = 2;
 
-/** One spare column so a full-width line never wraps into a second row. */
-export const SAFETY_MARGIN = 1;
+/** Spare columns kept between the text and the terminal's right edge. */
+export const SAFETY_MARGIN = 2;
 
 /**
  * Visible width of a status line (ANSI SGR sequences do not occupy columns). Every glyph
