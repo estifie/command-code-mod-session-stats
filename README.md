@@ -1,4 +1,4 @@
-# cmd-mod-session-stats
+# command-code-mod-session-stats
 
 A [Command Code](https://commandcode.ai) mod that keeps a session's vitals visible in the
 footer: how full the context window is, how well the prompt cache is hitting, and how much
@@ -38,13 +38,13 @@ anywhere.
 From a checkout:
 
 ```bash
-cmd mods add ./cmd-mod-session-stats
+cmd mods add ./command-code-mod-session-stats
 ```
 
 From Git:
 
 ```bash
-cmd mods add <owner>/<repo>
+cmd mods add estifie/command-code-mod-session-stats
 ```
 
 Or drop the directory into a mods folder by hand:

@@ -1,5 +1,5 @@
 {
-	"name": "cmd-mod-session-stats",
+	"name": "command-code-mod-session-stats",
 	"version": "1.0.0",
 	"description": "Command Code mod — live context usage, cache-hit rate and total session spend (sub-agents included) in the footer.",
 	"type": "module",
