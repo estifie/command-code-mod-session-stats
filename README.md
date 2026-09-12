@@ -28,6 +28,7 @@ spend $0.565 · in 272k (cache 271k) · out 338 · cache hit 99.8% · ctx 272k/1
 - **Sub-agent usage** — their tokens are never persisted anywhere, so they are folded in from
   the event stream and billed at the session's blended rate.
 - **Resume-friendly** — an old chat shows its history as soon as it is opened.
+- **Out of the way** — right-aligned to the terminal edge by default, and one line only.
 - **`/spend`** — the full breakdown on demand, and a `compact` mode when space is tight.
 
 The mod reads local session files only. It makes no network requests and sends nothing
@@ -75,6 +76,7 @@ report and refreshes through the run.
 | Option | Effect |
 | --- | --- |
 | `--mod-option compact=true` | Drop the `(272k/1M)` pair and the `sub` count, leaving `ctx 27.2% · cache 99.8% · $0.524`. |
+| `--mod-option align=left` | Stop padding the footer to the right edge; leave it left-aligned. |
 
 ### Commands
 
@@ -125,10 +127,13 @@ never rendered.
 
 ## Limitations
 
-- **The footer is a single line.** `cmd.ui.setStatus` is the only UI surface a mod can render
-  into today, and the host draws it as a left-aligned segment under the input panel. There is
-  no right alignment, corner placement, or in-place widget (Command Code's widget API is
-  documented as not wired yet). Keep the line short, or use `compact`.
+- **The footer is a single bottom row.** `cmd.ui.setStatus` is the only UI surface a mod can
+  render into today, and the host draws it under the input panel with no alignment option.
+  Right alignment is therefore emulated: the text is left-padded to the terminal width
+  (`align=right`, the default), and re-padded on resize. On a terminal too narrow for the
+  line, the padding drops and the text truncates — use `compact` when space is tight. There
+  is no top-right corner placement or in-place widget (Command Code's widget API is
+  documented as not wired yet).
 - **Pricing is Command Code's.** If the CLI could not price a model, entries carry no
   `costUsd` and the footer shows `cost –` instead of a fabricated number.
 - **Context windows are a snapshot** of the model catalog in `src/context-windows.ts`. An
@@ -141,7 +146,7 @@ never rendered.
 Requires Node 22.6+ for native TypeScript execution.
 
 ```bash
-npm test        # node --test — 26 tests
+npm test        # node --test — 32 tests
 ```
 
 The source is plain TypeScript with no build step: Command Code loads `index.ts` through
@@ -155,6 +160,7 @@ src/session-finder.ts locating the active transcript on disk
 src/context-windows.ts model → context window
 src/format.ts         number and tone helpers
 src/ansi.ts           colors
+src/align.ts          right-alignment padding
 src/argv.ts           session id from process args
 test/                 unit + integration tests (mock ModApi)
 ```

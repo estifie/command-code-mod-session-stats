@@ -134,6 +134,22 @@ test('/spend reports the full breakdown', () => {
 	assert.ok(text.includes('sub-agents 42k tokens'), text);
 });
 
+test('right-aligns the footer to the terminal width', () => {
+	const original = Object.getOwnPropertyDescriptor(process.stdout, 'columns');
+	Object.defineProperty(process.stdout, 'columns', {value: 80, configurable: true});
+	try {
+		const h = boot();
+		h.fire({type: 'run_start', sessionId: SESSION_ID});
+		const raw = h.status() ?? '';
+		assert.ok(raw.startsWith(' '), 'expected leading padding');
+		assert.ok(h.statusText()?.endsWith('$0.524'), h.statusText() ?? '');
+		assert.equal(stripAnsi(raw).length, 80 - 2 - 1);
+	} finally {
+		if (original) Object.defineProperty(process.stdout, 'columns', original);
+		else delete (process.stdout as {columns?: number}).columns;
+	}
+});
+
 test('session shutdown clears the footer', () => {
 	const h = boot();
 	h.fire({type: 'run_start', sessionId: SESSION_ID});

@@ -1,5 +1,6 @@
 import {randomUUID} from 'node:crypto';
 import {homedir} from 'node:os';
+import {alignLine, type Align} from './align.ts';
 import {colors, paint} from './ansi.ts';
 import {sessionIdFromArgv} from './argv.ts';
 import {contextLimitFor} from './context-windows.ts';
@@ -129,6 +130,7 @@ export function createMod(deps: ModDeps = {}) {
 		const currentUsage = (): Usage | null => liveUsage ?? log.lastUsage;
 		const currentModel = (): string | null => liveModel ?? log.lastModel;
 		const isCompact = (): boolean => cmd.getFlag('compact') === true;
+		const currentAlign = (): Align => (cmd.getFlag('align') === 'left' ? 'left' : 'right');
 
 		function render(): void {
 			const usage = currentUsage();
@@ -166,7 +168,7 @@ export function createMod(deps: ModDeps = {}) {
 				);
 			}
 
-			cmd.ui.setStatus(parts.join(separator));
+			cmd.ui.setStatus(alignLine(parts.join(separator), process.stdout?.columns, currentAlign()));
 		}
 
 		function detail(): string {
@@ -259,6 +261,15 @@ export function createMod(deps: ModDeps = {}) {
 			default: false,
 			description: 'Drop the token pair and sub-agent count from the footer',
 		});
+
+		cmd.addFlag('align', {
+			type: 'string',
+			default: 'right',
+			description: "Pad the footer to the right edge ('right', default) or leave it left-aligned ('left')",
+		});
+
+		// Re-pad when the terminal is resized — the padding is baked into the text.
+		process.stdout?.on?.('resize', () => render());
 
 		cmd.addCommand({
 			name: 'spend',
