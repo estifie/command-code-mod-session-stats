@@ -1,0 +1,35 @@
+{
+	"name": "cmd-mod-session-stats",
+	"version": "1.0.0",
+	"description": "Command Code mod — live context usage, cache-hit rate and total session spend (sub-agents included) in the footer.",
+	"type": "module",
+	"license": "MIT",
+	"keywords": [
+		"command-code",
+		"commandcode",
+		"mod",
+		"agent",
+		"context",
+		"tokens",
+		"cost",
+		"spend",
+		"cache"
+	],
+	"files": [
+		"index.ts",
+		"src",
+		"README.md",
+		"LICENSE"
+	],
+	"commandcode": {
+		"mods": [
+			"./index.ts"
+		]
+	},
+	"scripts": {
+		"test": "node --test"
+	},
+	"engines": {
+		"node": ">=22.6"
+	}
+}
