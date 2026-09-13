@@ -129,11 +129,13 @@ never rendered.
 
 - **The footer is a single bottom row.** `cmd.ui.setStatus` is the only UI surface a mod can
   render into today, and the host draws it under the input panel with no alignment option.
-  Right alignment is therefore emulated: the text is left-padded to the terminal width
-  (`align=right`, the default), and re-padded on resize. On a terminal too narrow for the
-  line, the padding drops and the text truncates — use `compact` when space is tight. There
-  is no top-right corner placement or in-place widget (Command Code's widget API is
-  documented as not wired yet).
+  Right alignment is therefore emulated by left-padding the text to the terminal width
+  (`align=right`, the default), re-padded on resize. The host sanitises a segment with
+  `replace(/ +/g, ' ').trim()`, so the padding is made of U+2800 BRAILLE PATTERN BLANK — an
+  invisible, one-column glyph — instead of spaces, which would be collapsed away. On a
+  terminal too narrow for the line the padding drops and the text truncates; use `compact`
+  when space is tight. There is no top-right corner placement or in-place widget (Command
+  Code's widget API is documented as not wired yet).
 - **Pricing is Command Code's.** If the CLI could not price a model, entries carry no
   `costUsd` and the footer shows `cost –` instead of a fabricated number.
 - **Context windows are a snapshot** of the model catalog in `src/context-windows.ts`. An
@@ -146,7 +148,7 @@ never rendered.
 Requires Node 22.6+ for native TypeScript execution.
 
 ```bash
-npm test        # node --test — 32 tests
+npm test        # node --test — 33 tests
 ```
 
 The source is plain TypeScript with no build step: Command Code loads `index.ts` through

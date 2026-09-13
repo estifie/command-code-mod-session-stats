@@ -9,6 +9,16 @@ export const HOST_PADDING_LEFT = 2;
 export const SAFETY_MARGIN = 2;
 
 /**
+ * Invisible, single-column pad character.
+ *
+ * The host sanitises a status segment with `replace(/ +/g, ' ').trim()`, which would erase
+ * any padding made of ordinary spaces. U+2800 BRAILLE PATTERN BLANK is not ASCII whitespace,
+ * so it survives that pass, and it measures exactly one column wide — the standard blank
+ * spacer for line-based TUIs.
+ */
+export const PAD_CHAR = '\u2800';
+
+/**
  * Visible width of a status line (ANSI SGR sequences do not occupy columns). Every glyph
  * this mod emits is single-width, so string length is exact here.
  */
@@ -32,5 +42,5 @@ export function alignLine(
 ): string {
 	if (align !== 'right' || !columns || columns <= 0) return line;
 	const padding = columns - hostPadding - margin - visibleWidth(line);
-	return padding > 0 ? ' '.repeat(padding) + line : line;
+	return padding > 0 ? PAD_CHAR.repeat(padding) + line : line;
 }

@@ -4,6 +4,7 @@ import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 import {after, test} from 'node:test';
 import {stripAnsi} from '../src/ansi.ts';
+import {PAD_CHAR} from '../src/align.ts';
 import {createMod, type ModApiLike, type ModEvent, type Timer} from '../src/mod.ts';
 
 const root = mkdtempSync(join(tmpdir(), 'session-stats-mod-'));
@@ -141,7 +142,7 @@ test('right-aligns the footer to the terminal width', () => {
 		const h = boot();
 		h.fire({type: 'run_start', sessionId: SESSION_ID});
 		const raw = h.status() ?? '';
-		assert.ok(raw.startsWith(' '), 'expected leading padding');
+		assert.ok(raw.startsWith(PAD_CHAR), 'expected leading padding');
 		assert.ok(h.statusText()?.endsWith('$0.524'), h.statusText() ?? '');
 		assert.equal(stripAnsi(raw).length, 80 - 2 - 2);
 	} finally {
