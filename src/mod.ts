@@ -130,7 +130,7 @@ export function createMod(deps: ModDeps = {}) {
 		const currentUsage = (): Usage | null => liveUsage ?? log.lastUsage;
 		const currentModel = (): string | null => liveModel ?? log.lastModel;
 		const isCompact = (): boolean => cmd.getFlag('compact') === true;
-		const currentAlign = (): Align => (cmd.getFlag('align') === 'left' ? 'left' : 'right');
+		const currentAlign = (): Align => (cmd.getFlag('align') === 'right' ? 'right' : 'left');
 
 		function render(): void {
 			const usage = currentUsage();
@@ -264,8 +264,8 @@ export function createMod(deps: ModDeps = {}) {
 
 		cmd.addFlag('align', {
 			type: 'string',
-			default: 'right',
-			description: "Pad the footer to the right edge ('right', default) or leave it left-aligned ('left')",
+			default: 'left',
+			description: "Leave the footer left-aligned ('left', default) or pad it to the right edge ('right')",
 		});
 
 		// Re-pad when the terminal is resized — the padding is baked into the text.

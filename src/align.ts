@@ -27,16 +27,17 @@ export function visibleWidth(line: string): number {
 }
 
 /**
- * Right-align a status line by left-padding it with spaces.
+ * Optionally right-align a status line by padding it out to the terminal width.
  *
- * `cmd.ui.setStatus` renders its text verbatim in a single left-aligned row, and there is
- * no alignment option on the API — so pushing the text to the right edge is done with
- * leading spaces sized to the terminal. Returns the line unchanged when it cannot fit.
+ * `cmd.ui.setStatus` renders its text verbatim in a single left-aligned row, and there is no
+ * alignment option on the API, so pushing the text to the right edge has to be done by hand.
+ * Left alignment is the default and is a no-op; `align=right` opts in. Returns the line
+ * unchanged when it cannot fit.
  */
 export function alignLine(
 	line: string,
 	columns: number | undefined,
-	align: Align = 'right',
+	align: Align = 'left',
 	hostPadding: number = HOST_PADDING_LEFT,
 	margin: number = SAFETY_MARGIN,
 ): string {

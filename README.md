@@ -28,7 +28,8 @@ spend $0.565 · in 272k (cache 271k) · out 338 · cache hit 99.8% · ctx 272k/1
 - **Sub-agent usage** — their tokens are never persisted anywhere, so they are folded in from
   the event stream and billed at the session's blended rate.
 - **Resume-friendly** — an old chat shows its history as soon as it is opened.
-- **Out of the way** — right-aligned to the terminal edge by default, and one line only.
+- **Out of the way** — one line only, left-aligned by default; `align=right` pads it to the
+  terminal edge.
 - **`/spend`** — the full breakdown on demand, and a `compact` mode when space is tight.
 
 The mod reads local session files only. It makes no network requests and sends nothing
@@ -76,7 +77,7 @@ report and refreshes through the run.
 | Option | Effect |
 | --- | --- |
 | `--mod-option compact=true` | Drop the `(272k/1M)` pair and the `sub` count, leaving `ctx 27.2% · cache 99.8% · $0.524`. |
-| `--mod-option align=left` | Stop padding the footer to the right edge; leave it left-aligned. |
+| `--mod-option align=right` | Pad the footer to the terminal's right edge instead of leaving it left-aligned. |
 
 ### Commands
 
@@ -127,15 +128,16 @@ never rendered.
 
 ## Limitations
 
-- **The footer is a single bottom row.** `cmd.ui.setStatus` is the only UI surface a mod can
-  render into today, and the host draws it under the input panel with no alignment option.
-  Right alignment is therefore emulated by left-padding the text to the terminal width
-  (`align=right`, the default), re-padded on resize. The host sanitises a segment with
-  `replace(/ +/g, ' ').trim()`, so the padding is made of U+2800 BRAILLE PATTERN BLANK — an
-  invisible, one-column glyph — instead of spaces, which would be collapsed away. On a
-  terminal too narrow for the line the padding drops and the text truncates; use `compact`
-  when space is tight. There is no top-right corner placement or in-place widget (Command
-  Code's widget API is documented as not wired yet).
+- **The footer is a single bottom row, and it is the only row a mod gets.** `cmd.ui.setStatus`
+  is the sole UI surface a mod can render into today: the host draws the segment under the
+  input panel, on its own line, and offers no alignment or placement option. A mod therefore
+  cannot write onto the host's own rows — the permission/shortcut line above keeps its right
+  edge to the built-in context indicator. The footer is left-aligned by default; `align=right`
+  emulates right alignment by padding the text out to the terminal width, re-padded on resize.
+  The host sanitises a segment with `replace(/ +/g, ' ').trim()`, so that padding is made of
+  U+2800 BRAILLE PATTERN BLANK — an invisible, one-column glyph — rather than spaces, which
+  would be collapsed away. On a terminal too narrow for the line the padding drops and the
+  text truncates; use `compact` when space is tight.
 - **Pricing is Command Code's.** If the CLI could not price a model, entries carry no
   `costUsd` and the footer shows `cost –` instead of a fabricated number.
 - **Context windows are a snapshot** of the model catalog in `src/context-windows.ts`. An
@@ -148,7 +150,7 @@ never rendered.
 Requires Node 22.6+ for native TypeScript execution.
 
 ```bash
-npm test        # node --test — 33 tests
+npm test        # node --test — 35 tests
 ```
 
 The source is plain TypeScript with no build step: Command Code loads `index.ts` through
@@ -162,7 +164,7 @@ src/session-finder.ts locating the active transcript on disk
 src/context-windows.ts model → context window
 src/format.ts         number and tone helpers
 src/ansi.ts           colors
-src/align.ts          right-alignment padding
+src/align.ts          optional right-alignment padding
 src/argv.ts           session id from process args
 test/                 unit + integration tests (mock ModApi)
 ```

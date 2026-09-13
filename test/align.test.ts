@@ -9,10 +9,14 @@ test('visibleWidth ignores ANSI escape sequences', () => {
 	assert.equal(visibleWidth('ctx 27%'), 7);
 });
 
-test('alignLine pads to the right edge by default', () => {
+test('alignLine is a no-op by default', () => {
+	assert.equal(alignLine('ctx 27.2% · $0.524', 80), 'ctx 27.2% · $0.524');
+});
+
+test('alignLine pads to the right edge when asked', () => {
 	const columns = 80;
 	const line = 'ctx 27.2% · $0.524';
-	const padded = alignLine(line, columns);
+	const padded = alignLine(line, columns, 'right');
 
 	assert.equal(padded, PAD_CHAR.repeat(columns - HOST_PADDING_LEFT - SAFETY_MARGIN - visibleWidth(line)) + line);
 	assert.equal(visibleWidth(padded), columns - HOST_PADDING_LEFT - SAFETY_MARGIN);
@@ -20,14 +24,15 @@ test('alignLine pads to the right edge by default', () => {
 });
 
 test('alignLine leaves the line untouched when it cannot fit', () => {
-	assert.equal(alignLine('a very long line', 10), 'a very long line');
+	assert.equal(alignLine('a very long line', 10, 'right'), 'a very long line');
 });
 
 test('alignLine is a no-op for left alignment or unknown width', () => {
 	const line = 'ctx 27.2%';
 	assert.equal(alignLine(line, 80, 'left'), line);
-	assert.equal(alignLine(line, undefined), line);
-	assert.equal(alignLine(line, 0), line);
+	assert.equal(alignLine(line, 80), line);
+	assert.equal(alignLine(line, undefined, 'right'), line);
+	assert.equal(alignLine(line, 0, 'right'), line);
 });
 
 test('alignLine respects custom padding and margin', () => {
@@ -39,7 +44,7 @@ test('padded lines survive the host status sanitizer', () => {
 	// which is why the padding is not made of ordinary spaces.
 	const sanitize = (text: string): string =>
 		text.replace(/[\r\n\t]/g, ' ').replace(/ +/g, ' ').trim();
-	const padded = alignLine('ctx 27% · $0.524', 80);
+	const padded = alignLine('ctx 27% · $0.524', 80, 'right');
 	assert.equal(sanitize(padded), padded);
 	assert.ok(sanitize(' '.repeat(20) + 'ctx'), 'ordinary spaces would not survive');
 });

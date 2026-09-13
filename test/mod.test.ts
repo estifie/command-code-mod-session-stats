@@ -38,7 +38,7 @@ interface Harness {
 	spend: () => string;
 }
 
-function boot(options: {argv?: string[]; compact?: boolean} = {}): Harness {
+function boot(options: {argv?: string[]; compact?: boolean; align?: string} = {}): Harness {
 	const handlers = new Map<string, Array<(event: ModEvent) => void>>();
 	let status: string | null = null;
 	let command: {handler: () => {message?: string}} | null = null;
@@ -49,7 +49,8 @@ function boot(options: {argv?: string[]; compact?: boolean} = {}): Harness {
 		on: (event, handler) => void handlers.set(event, [...(handlers.get(event) ?? []), handler]),
 		hooks: () => undefined,
 		addFlag: () => undefined,
-		getFlag: name => (name === 'compact' ? options.compact === true : undefined),
+		getFlag: name =>
+			name === 'compact' ? options.compact === true : name === 'align' ? options.align : undefined,
 		addCommand: input => void (command = input),
 	};
 
@@ -135,11 +136,18 @@ test('/spend reports the full breakdown', () => {
 	assert.ok(text.includes('sub-agents 42k tokens'), text);
 });
 
-test('right-aligns the footer to the terminal width', () => {
+test('leaves the footer left-aligned by default', () => {
+	const h = boot();
+	h.fire({type: 'run_start', sessionId: SESSION_ID});
+	assert.ok(h.statusText()?.startsWith('ctx'), h.statusText() ?? '');
+	assert.ok(!(h.status() ?? '').includes(PAD_CHAR), 'expected no padding');
+});
+
+test('right-aligns the footer to the terminal width when asked', () => {
 	const original = Object.getOwnPropertyDescriptor(process.stdout, 'columns');
 	Object.defineProperty(process.stdout, 'columns', {value: 80, configurable: true});
 	try {
-		const h = boot();
+		const h = boot({align: 'right'});
 		h.fire({type: 'run_start', sessionId: SESSION_ID});
 		const raw = h.status() ?? '';
 		assert.ok(raw.startsWith(PAD_CHAR), 'expected leading padding');
